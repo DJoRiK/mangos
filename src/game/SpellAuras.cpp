@@ -6050,19 +6050,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                     m_target->CastSpell(m_target, 24932, true, NULL, this);
             }
 
-            // Improved Barkskin - apply/remove armor bonus due to shapeshift
-            if (((Player*)m_target)->HasSpell(63410) || ((Player*)m_target)->HasSpell(63411))
-            {
-                SpellEntry const *spellInfo = sSpellStore.LookupEntry(66530);
-                if (form == FORM_TRAVEL || form == FORM_NONE)
-                {
-                    m_target->RemoveAurasDueToSpell(66530);
-                    m_target->CastSpell(m_target,66530,true);
-                }
-                else
-                    m_target->RemoveAurasDueToSpell(66530);
-            }
-
             // Savage Roar
             if (form == FORM_CAT && ((Player*)m_target)->HasAura(52610))
                 m_target->CastSpell(m_target, 62071, true);
@@ -6094,6 +6081,18 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 }
             }
 
+            // Improved Barkskin - apply/remove armor bonus due to shapeshift remove
+            if (((Player*)m_target)->HasSpell(63410) || ((Player*)m_target)->HasSpell(63411))
+            {
+                if (form == FORM_TRAVEL)
+                {
+                    m_target->RemoveAurasDueToSpell(66530);
+                    m_target->CastSpell(m_target,66530,true);
+                }
+                else
+                    m_target->RemoveAurasDueToSpell(66530);
+            }
+
             // Heart of the Wild
             if (HotWSpellId)
             {
@@ -6121,6 +6120,13 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             m_target->RemoveAurasDueToSpell(spellId2);
         if(MasterShaperSpellId)
             m_target->RemoveAurasDueToSpell(MasterShaperSpellId);
+
+        // Improved Barkskin - apply/remove armor bonus due to shapeshift
+        if (((Player*)m_target)->HasSpell(63410) || ((Player*)m_target)->HasSpell(63411))
+        {
+            m_target->RemoveAurasDueToSpell(66530);
+            m_target->CastSpell(m_target,66530,true);
+        }
 
         Unit::AuraMap& tAuras = m_target->GetAuras();
         for (Unit::AuraMap::iterator itr = tAuras.begin(); itr != tAuras.end();)
