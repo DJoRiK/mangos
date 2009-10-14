@@ -9856,13 +9856,14 @@ uint32 Unit::MeleeDamageBonus(Unit *pVictim, uint32 pdamage,WeaponAttackType att
             {
                 if(pVictim->GetTypeId() != TYPEID_PLAYER)
                     continue;
+
                 // Value is based at info from wowwiki
                 float mod = ((Player*)pVictim)->GetDefenseSkillValue() * (-0.065f);
                 // Base value is 30%. Add 10% back if we don't have Glyph of Icebound Fortitude.
                 if (!pVictim->HasAura(58625))
-                    TakenTotalMod += 0.1f;
+                    TakenPercent += 0.1f;
 
-                TakenTotalMod *= (mod+100.0f)/100.0f;
+                TakenPercent *= (mod + 100.0f) / 100.0f;
                 break;
             }
         }
