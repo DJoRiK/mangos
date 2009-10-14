@@ -60,10 +60,10 @@ typedef std::map<uint32,RedirectThreatEntry*> RedirectThreatMap;
 
 //==============================================================
 
-class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
+class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 {
     public:
-        HostilReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
+        HostileReference(Unit* pUnit, ThreatManager *pThreatManager, float pThreat);
 
         //=================================================
         void addThreat(float pMod);
@@ -103,7 +103,7 @@ class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
         void setAccessibleState(bool pIsAccessible);
         //=================================================
 
-        bool operator ==(const HostilReference& pHostilReference) const { return pHostilReference.getUnitGuid() == getUnitGuid(); }
+        bool operator ==(const HostileReference& pHostileReference) const { return pHostileReference.getUnitGuid() == getUnitGuid(); }
 
         //=================================================
 
@@ -116,7 +116,7 @@ class MANGOS_DLL_SPEC HostilReference : public Reference<Unit, ThreatManager>
 
         //=================================================
 
-        HostilReference* next() { return ((HostilReference* ) Reference<Unit, ThreatManager>::next()); }
+        HostileReference* next() { return ((HostileReference* ) Reference<Unit, ThreatManager>::next()); }
 
         //=================================================
 
@@ -147,13 +147,13 @@ class ThreatManager;
 class MANGOS_DLL_SPEC ThreatContainer
 {
     private:
-        std::list<HostilReference*> iThreatList;
+        std::list<HostileReference*> iThreatList;
         bool iDirty;
     protected:
         friend class ThreatManager;
 
-        void remove(HostilReference* pRef) { iThreatList.remove(pRef); }
-        void addReference(HostilReference* pHostilReference) { iThreatList.push_back(pHostilReference); }
+        void remove(HostileReference* pRef) { iThreatList.remove(pRef); }
+        void addReference(HostileReference* pHostileReference) { iThreatList.push_back(pHostileReference); }
         void clearReferences();
         // Sort the list if necessary
         void update();
@@ -161,11 +161,11 @@ class MANGOS_DLL_SPEC ThreatContainer
         ThreatContainer() { iDirty = false; }
         ~ThreatContainer() { clearReferences(); }
 
-        HostilReference* addThreat(Unit* pVictim, float pThreat);
+        HostileReference* addThreat(Unit* pVictim, float pThreat);
 
         void modifyThreatPercent(Unit *pVictim, int32 percent);
 
-        HostilReference* selectNextVictim(Creature* pAttacker, HostilReference* pCurrentVictim);
+        HostileReference* selectNextVictim(Creature* pAttacker, HostileReference* pCurrentVictim);
 
         void setDirty(bool pDirty) { iDirty = pDirty; }
 
@@ -173,11 +173,11 @@ class MANGOS_DLL_SPEC ThreatContainer
 
         bool empty() { return(iThreatList.empty()); }
 
-        HostilReference* getMostHated() { return iThreatList.empty() ? NULL : iThreatList.front(); }
+        HostileReference* getMostHated() { return iThreatList.empty() ? NULL : iThreatList.front(); }
 
-        HostilReference* getReferenceByTarget(Unit* pVictim);
+        HostileReference* getReferenceByTarget(Unit* pVictim);
 
-        std::list<HostilReference*>& getThreatList() { return iThreatList; }
+        std::list<HostileReference*>& getThreatList() { return iThreatList; }
 };
 
 //=================================================
@@ -185,7 +185,7 @@ class MANGOS_DLL_SPEC ThreatContainer
 class MANGOS_DLL_SPEC ThreatManager
 {
     public:
-        friend class HostilReference;
+        friend class HostileReference;
 
         explicit ThreatManager(Unit *pOwner);
 
@@ -202,27 +202,27 @@ class MANGOS_DLL_SPEC ThreatManager
 
         void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
-        HostilReference* getCurrentVictim() { return iCurrentVictim; }
+        HostileReference* getCurrentVictim() { return iCurrentVictim; }
 
         Unit*  getOwner() { return iOwner; }
 
-        Unit* getHostilTarget();
+        Unit* getHostileTarget();
 
         void tauntApply(Unit* pTaunter);
         void tauntFadeOut(Unit *pTaunter);
 
-        void setCurrentVictim(HostilReference* pHostilReference);
+        void setCurrentVictim(HostileReference* pHostileReference);
 
         void setDirty(bool pDirty) { iThreatContainer.setDirty(pDirty); }
 
         // methods to access the lists from the outside to do sume dirty manipulation (scriping and such)
         // I hope they are used as little as possible.
-        std::list<HostilReference*>& getThreatList() { return iThreatContainer.getThreatList(); }
-        std::list<HostilReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
+        std::list<HostileReference*>& getThreatList() { return iThreatContainer.getThreatList(); }
+        std::list<HostileReference*>& getOfflieThreatList() { return iThreatOfflineContainer.getThreatList(); }
         ThreatContainer& getOnlineContainer() { return iThreatContainer; }
         ThreatContainer& getOfflineContainer() { return iThreatOfflineContainer; }
     private:
-        HostilReference* iCurrentVictim;
+        HostileReference* iCurrentVictim;
         Unit* iOwner;
         ThreatContainer iThreatContainer;
         ThreatContainer iThreatOfflineContainer;
