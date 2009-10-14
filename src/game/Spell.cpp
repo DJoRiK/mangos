@@ -2730,6 +2730,8 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_WARRIOR:
         {
+            if(m_spellInfo->Id == 1680 || m_spellInfo->Id == 50622)
+                AddTriggeredSpell(44949);
             if(m_spellInfo->Id == 64382)
                 AddPrecastSpell(64380);
             break;
