@@ -9626,6 +9626,7 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo)
     }
 
     if(uint32 mechanic = spellInfo->Mechanic)
+    {
         SpellImmuneList const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
         for(SpellImmuneList::const_iterator itr = mechanicList.begin(); itr != mechanicList.end(); ++itr)
             if (itr->type == mechanic)
