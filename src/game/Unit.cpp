@@ -788,11 +788,13 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // polymorphed, hex and other negative transformed cases
         uint32 morphspell = pVictim->getTransForm();
-        if(!IsPositiveSpell(morphspell))
+        if(morphspell && !IsPositiveSpell(morphspell))
+        {
             if (IsSpellHaveAura(sSpellStore.LookupEntry(morphspell), SPELL_AURA_MOD_CONFUSE))
                 pVictim->RemoveAurasDueToSpell(morphspell);
             else if (IsSpellHaveAura(sSpellStore.LookupEntry(morphspell), SPELL_AURA_MOD_PACIFY_SILENCE))
                 pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_PACIFY_SILENCE, damage);
+        }
 
         if(damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
         {
