@@ -11082,7 +11082,7 @@ RedirectThreatEntry* Unit::GetRedirectThreatEntry(RedirectThreatMap* map, uint32
     return NULL;
 }
 
-float Unit::AddThreatToRedirectionTargets(Unit* pVictim, float threat, SpellSchoolMask schoolMask, SpellEntry const *threatSpell)
+float Unit::AddThreatToRedirectionTargets(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *threatSpell)
 {
     float remainThreatPct = 1.0f;
 
@@ -11094,7 +11094,7 @@ float Unit::AddThreatToRedirectionTargets(Unit* pVictim, float threat, SpellScho
     if (map && !map->empty())
         for (RedirectThreatMap::iterator iter = map->begin(); iter != map->end(); ++iter)
         {
-            m_ThreatManager.addThreat(iter->second->m_redirectTo, threat * (iter->second->m_redirectPct), schoolMask, threatSpell);
+            m_ThreatManager.addThreat(iter->second->m_redirectTo, threat * (iter->second->m_redirectPct), crit, schoolMask, threatSpell);
             remainThreatPct -= iter->second->m_redirectPct;
         }
 

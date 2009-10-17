@@ -1592,7 +1592,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HandleMendingAuraProc(Aura* triggeredByAura);
 
         RedirectThreatEntry* GetRedirectThreatEntry(RedirectThreatMap* map, uint32 spellId);
-        float AddThreatToRedirectionTargets(Unit* pVictim, float threat, SpellSchoolMask schoolMask, SpellEntry const *threatSpell);
+        float AddThreatToRedirectionTargets(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *threatSpell);
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
