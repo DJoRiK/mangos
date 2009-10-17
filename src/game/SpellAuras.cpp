@@ -4717,6 +4717,9 @@ void Aura::HandlePeriodicEnergize(bool apply, bool Real)
 	case 61782: // Infinite Replenishment
 		m_modifier.m_amount = m_target->GetMaxPower(POWER_MANA) * 25 / 10000;
 		break;
+	case 48391: //Owlkin Frenzy
+        m_modifier.m_amount = m_target->GetCreateMana() * 2 / 100;
+		break;
 	case 29166: //Innervate
 		Player *caster = objmgr.GetPlayer(m_caster_guid);
 		if (caster) m_modifier.m_amount = caster->GetCreateMana() * 45 / 200;
