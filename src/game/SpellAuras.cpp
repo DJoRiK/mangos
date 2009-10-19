@@ -6590,7 +6590,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
             m_target->RemoveAurasDueToSpell(remove_spell);
         }
 
-        // Ice Barrier (remove effect from Shattered Barrier)
+        /*// Ice Barrier (remove effect from Shattered Barrier)
         if (m_spellProto->SpellIconID == 32 && m_spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
         {
             if (!((m_removeMode == AURA_REMOVE_BY_DEFAULT && !m_modifier.m_amount) || m_removeMode == AURA_REMOVE_BY_DISPEL))
@@ -6669,7 +6669,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
