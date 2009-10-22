@@ -37,6 +37,7 @@
 #include "ObjectDefines.h"
 #include "Policies/Singleton.h"
 #include "Database/SQLStorage.h"
+#include "Corpse.h"
 
 #include <string>
 #include <map>
