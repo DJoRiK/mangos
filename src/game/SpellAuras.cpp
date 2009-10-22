@@ -2214,6 +2214,7 @@ void Aura::TriggerSpell()
             case 52987: // Heal effect - Rank 3
             case 52988: // Heal effect - Rank 4
             {
+                Unit* caster = GetCaster();
                 if (!target->isAlive())
                 {
                     caster->RemoveAurasDueToSpell(auraId);
