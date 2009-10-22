@@ -2730,7 +2730,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell)
     uint32 rand = urand(0,10000);
 
     if (rand < tmp)
-        return SPELL_MISS_MISS;
+        return SPELL_MISS_RESIST;
 
     // cast by caster in front of victim
     if (pVictim->HasInArc(M_PI,this))
