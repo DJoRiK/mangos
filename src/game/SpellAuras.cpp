@@ -4876,17 +4876,6 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                 }
                 break;
             }
-            case SPELLFAMILY_WARLOCK:
-            {
-                // Drain Soul
-                if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000004000))
-                {
-                    if (m_target->GetHealth() * 100 / m_target->GetMaxHealth() <= 25)
-                       m_modifier.m_amount *= 4;
-                    return;
-                }
-                break;
-            }
             case SPELLFAMILY_DRUID:
             {
                 // Rake
@@ -6575,11 +6564,6 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                         // +75% from spell power
                         DoneActualBenefit = caster->SpellBaseHealingBonus(GetSpellSchoolMask(m_spellProto)) * 0.75f;
                     }
-                    break;
-                case SPELLFAMILY_DRUID:
-                    // Savage Defense (amount store original percent of attack power applied)
-                    if (m_spellProto->SpellIconID == 50)    // only spell with this aura fit
-                        m_modifier.m_amount = int32(m_modifier.m_amount * m_target->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
                     break;
                 default:
                     break;
