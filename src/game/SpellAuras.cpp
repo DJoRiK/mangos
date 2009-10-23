@@ -4792,9 +4792,11 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
             {
                 case 48018:
                     if (apply)
+                        SendFakeAuraUpdate(62388,false);
+                    else
                     {
-                        if (m_target->GetGameObject(spell->Id))
-                            m_target->RemoveGameObject(spell->Id,true);
+                        m_target->RemoveGameObject(spell->Id,true);
+                        SendFakeAuraUpdate(62388,true);
                     }
                 break;
             }
@@ -7559,12 +7561,7 @@ void Aura::PeriodicDummyTick()
             {
                 case 48018:
                     GameObject* obj = m_target->GetGameObject(spell->Id);
-                    if (!obj)
-                    {
-                        m_target->RemoveAurasDueToSpell(spell->Id);
-                        SendFakeAuraUpdate(62388,true);
-                        return;
-                    }
+                    if (!obj) return;
                     // We must take a range of teleport spell, not summon.
                     const SpellEntry* goToCircleSpell = sSpellStore.LookupEntry(48020);
                     if (m_target->IsWithinDist(obj,GetSpellMaxRange(sSpellRangeStore.LookupEntry(goToCircleSpell->rangeIndex))))
