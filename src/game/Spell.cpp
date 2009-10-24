@@ -479,7 +479,7 @@ void Spell::FillCustomTargetMap(uint32 i, UnitList& TagUnitMap)
     // Resulting effect depends on spell that we want to cast
     switch (m_spellInfo->Id)
     {
-        case 48743: // Death Pact
+        /*case 48743: // Death Pact
         {
             Unit* unit_to_add = NULL;
             if (Player* modOwner = m_caster->GetSpellModOwner())
@@ -514,7 +514,7 @@ void Spell::FillCustomTargetMap(uint32 i, UnitList& TagUnitMap)
                 }
             }
             break;
-        }
+        }*/
         case 46584: // Raise Dead
         {
             WorldObject* result = FindCorpseUsing <MaNGOS::RaiseDeadObjectCheck>  ();
