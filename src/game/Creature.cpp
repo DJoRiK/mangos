@@ -42,7 +42,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "OutdoorPvPMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -827,10 +826,6 @@ void Creature::prepareGossipMenu( Player *pPlayer,uint32 gossipid )
                     case GOSSIP_OPTION_TABARDDESIGNER:
                     case GOSSIP_OPTION_AUCTIONEER:
                         break;                              // no checks
-                    case GOSSIP_OPTION_OUTDOORPVP:
-                        if (!pPlayer->Script_CanTalkTo(this, (*gso)))
-                             cantalking = false;
-                         break;
                     default:
                         sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u",GetDBTableGUIDLow(),GetEntry(),gso->Action);
                         break;
@@ -922,9 +917,6 @@ void Creature::OnGossipSelect(Player* player, uint32 option)
             player->PlayerTalkClass->SendTalking(textid);
             break;
         }
-        case GOSSIP_OPTION_OUTDOORPVP:
-            player->Script_HandleGossipOption(GetGUID(), option);
-            break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (player->isDead())
                 CastSpell(this,17251,true,NULL,NULL,player->GetGUID());
