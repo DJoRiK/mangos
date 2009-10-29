@@ -7129,7 +7129,7 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                 {
                     if (triggerAmount == 0)
                         return false;
-                    basepoints0 = triggerAmount * GetMaxHealth() / 100;
+                    basepoints[0] = triggerAmount * GetMaxHealth() / 100;
                     trigger_spell_id = 34299;
                 }
                 break;
