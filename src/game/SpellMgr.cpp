@@ -1732,7 +1732,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     return false;
 
                 // Other auras remove Aura Mastery immunity effect.
-                if (spellInfo_1->Id == 64364 && spellInfo_2->SpellFamilyFlags2 == UI64LIT(0x20))
+                if (spellInfo_1->SpellFamilyFlags2 == UI64LIT(0x20) && spellInfo_2->Id == 64364)
                     return true;
 
                 // Swift Retribution / Improved Devotion Aura (talents) and Paladin Auras
