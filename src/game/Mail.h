@@ -19,7 +19,6 @@
 #define MANGOS_MAIL_H
 
 #include "Common.h"
-#include "Item.h"
 #include <map>
 
 class Item;
