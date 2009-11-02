@@ -4977,6 +4977,27 @@ void Spell::EffectWeaponDmg(uint32 i)
         if(m_caster->GetTypeId()==TYPEID_PLAYER)
             ((Player*)m_caster)->AddComboPoints(unitTarget, 1);
     }
+    else if(m_spellInfo->SpellFamilyName==SPELLFAMILY_PALADIN)
+    {
+        // Judgement of Blood/of the Martyr backlash damage (33%)
+        if(m_spellInfo->SpellFamilyFlags & 0x0000000800000000LL && m_spellInfo->SpellIconID==153)
+        {
+            int32 damagePoint  = m_damage * 33 / 100;
+            if(m_spellInfo->Id == 31898)
+                m_caster->CastCustomSpell(m_caster, 32220, &damagePoint, NULL, NULL, true);
+            else
+                m_caster->CastCustomSpell(m_caster, 53725, &damagePoint, NULL, NULL, true);
+        }
+        // Seal of Blood/of the Martyr backlash damage (10%)
+        else if(m_spellInfo->SpellIconID==2293)
+        {
+            int32 damagePoint  = m_damage * 10 / 100;
+            if(m_spellInfo->Id == 31893)
+                m_caster->CastCustomSpell(m_caster, 32221, &damagePoint, NULL, NULL, true);
+            else
+                m_caster->CastCustomSpell(m_caster, 53718, &damagePoint, NULL, NULL, true);
+        }
+    }
 
     // take ammo
     if(m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
