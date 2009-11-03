@@ -2354,6 +2354,9 @@ void Player::GiveXP(uint32 xp, Unit* victim)
     if(!isAlive())
         return;
 
+    if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN))
+        return;
+
     uint32 level = getLevel();
 
     // XP to money conversion processed in Player::RewardQuest
