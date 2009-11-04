@@ -2665,7 +2665,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 // Zero duration is equal to AURA_REMOVE_BY_DEFAULT. We can't use it directly, as it is set even
                 // when removing aura from one target due to casting Living Bomb at other.
-                if (!apply && (m_duration == 0 || m_removeMode == AURA_REMOVE_BY_DISPEL))
+                if (caster && !apply && (m_duration == 0 || m_removeMode == AURA_REMOVE_BY_DISPEL))
                     caster->CastSpell(m_target,m_modifier.m_amount,true);
                 return;
             }
