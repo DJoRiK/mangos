@@ -2426,8 +2426,10 @@ bool InstanceMap::Add(Player *player)
                     if(!playerBind)
                         player->BindToInstance(mapSave, false);
                     else
+                    {
                         // cannot jump to a different instance without resetting it
-                        assert(playerBind->save == mapSave);
+                        //assert(playerBind->save == mapSave);
+                    }
                 }
             }
         }
