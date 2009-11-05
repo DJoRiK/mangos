@@ -575,7 +575,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             }
         }
 
-        if(delta > 100.0f)
+        if(delta > 100.0f && GetPlayer()->GetZoneId() != 2257)
         {
             Anti__ReportCheat("Tele hack",delta,LookupOpcodeName(opcode));
         }
