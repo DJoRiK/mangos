@@ -26,7 +26,7 @@
 #include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
-#include "PoolHandler.h"
+#include "PoolManager.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "LootMgr.h"
@@ -183,7 +183,7 @@ void Creature::RemoveCorpse()
  */
 bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
 {
-    CreatureInfo const *normalInfo = objmgr.GetCreatureTemplate(Entry);
+    CreatureInfo const *normalInfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!normalInfo)
     {
         sLog.outErrorDb("Creature::UpdateEntry creature entry %u does not exist.", Entry);
@@ -201,7 +201,7 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
             // we already have valid Map pointer for current creature!
             if (GetMap()->GetSpawnMode() > diff)
             {
-                cinfo = objmgr.GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
+                cinfo = ObjectMgr::GetCreatureTemplate(normalInfo->DifficultyEntry[diff]);
                 if (!cinfo)
                 {
                     // maybe check such things already at startup
@@ -1333,7 +1333,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
 
 bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 team, const CreatureData *data)
 {
-    CreatureInfo const *cinfo = objmgr.GetCreatureTemplate(Entry);
+    CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!cinfo)
     {
         sLog.outErrorDb("Creature entry %u does not exist.", Entry);
@@ -2246,7 +2246,7 @@ uint32 Creature::GetVendorItemCurrentCount(VendorItem const* vItem)
 
     if( vCount->lastIncrementTime + vItem->incrtime <= ptime )
     {
-        ItemPrototype const* pProto = objmgr.GetItemPrototype(vItem->item);
+        ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(vItem->item);
 
         uint32 diff = uint32((ptime - vCount->lastIncrementTime)/vItem->incrtime);
         if((vCount->count + diff * pProto->BuyCount) >= vItem->maxcount )
@@ -2285,7 +2285,7 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
 
     if( vCount->lastIncrementTime + vItem->incrtime <= ptime )
     {
-        ItemPrototype const* pProto = objmgr.GetItemPrototype(vItem->item);
+        ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(vItem->item);
 
         uint32 diff = uint32((ptime - vCount->lastIncrementTime)/vItem->incrtime);
         if((vCount->count + diff * pProto->BuyCount) < vItem->maxcount )

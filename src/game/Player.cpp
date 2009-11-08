@@ -568,7 +568,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
         return false;
     }
 
-    SetMap(MapManager::Instance().CreateMap(info->mapId, this));
+    SetMap(mapmgr.CreateMap(info->mapId, this));
 
     uint8 powertype = cEntry->powerType;
 
@@ -690,7 +690,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
             if(item_id==40582)
                 continue;
 
-            ItemPrototype const* iProto = objmgr.GetItemPrototype(item_id);
+            ItemPrototype const* iProto = ObjectMgr::GetItemPrototype(item_id);
             if(!iProto)
             {
                 sLog.outErrorDb("Initial item id %u (race %u class %u) from CharStartOutfit.dbc not listed in `item_template`, ignoring.",item_id,getRace(),getClass());
@@ -1515,7 +1515,7 @@ bool Player::BuildEnumData( QueryResult * result, WorldPacket * p_data )
     {
         uint32 visualbase = PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2);
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        const ItemPrototype * proto = objmgr.GetItemPrototype(item_id);
+        const ItemPrototype * proto = ObjectMgr::GetItemPrototype(item_id);
         if(!proto)
         {
             *p_data << uint32(0);
@@ -1697,12 +1697,12 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // Check enter rights before map getting to avoid creating instance copy for player
         // this check not dependent from map instance copy and same for all instance copies of selected map
-        if (!MapManager::Instance().CanPlayerEnter(mapid, this))
+        if (!mapmgr.CanPlayerEnter(mapid, this))
             return false;
 
         // If the map is not created, assume it is possible to enter it.
         // It will be created in the WorldPortAck.
-        Map *map = MapManager::Instance().FindMap(mapid);
+        Map *map = mapmgr.FindMap(mapid);
         if (!map ||  map->CanEnter(this))
         {
             //lets reset near teleport flag if it wasn't reset during chained teleports
@@ -3907,7 +3907,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
     // convert corpse to bones if exist (to prevent exiting Corpse in World without DB entry)
     // bones will be deleted by corpse/bones deleting thread shortly
-    ObjectAccessor::Instance().ConvertCorpseForPlayer(playerguid);
+    objaccessor.ConvertCorpseForPlayer(playerguid);
 
     // remove from guild
     uint32 guildId = GetGuildIdFromDB(playerguid);
@@ -3983,7 +3983,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                         uint32 item_guidlow = fields2[1].GetUInt32();
                         uint32 item_template = fields2[2].GetUInt32();
 
-                        ItemPrototype const* itemProto = objmgr.GetItemPrototype(item_template);
+                        ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(item_template);
                         if(!itemProto)
                         {
                             CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_guidlow);
@@ -4315,18 +4315,18 @@ void Player::CreateCorpse()
         corpse->SaveToDB();
 
     // register for player, but not show
-    ObjectAccessor::Instance().AddCorpse(corpse);
+    objaccessor.AddCorpse(corpse);
 }
 
 void Player::SpawnCorpseBones()
 {
-    if(ObjectAccessor::Instance().ConvertCorpseForPlayer(GetGUID()))
+    if(objaccessor.ConvertCorpseForPlayer(GetGUID()))
         SaveToDB();                                         // prevent loading as ghost without corpse
 }
 
 Corpse* Player::GetCorpse() const
 {
-    return ObjectAccessor::Instance().GetCorpseForPlayerGUID(GetGUID());
+    return objaccessor.GetCorpseForPlayerGUID(GetGUID());
 }
 
 void Player::DurabilityLossAll(double percent, bool inventory)
@@ -5598,7 +5598,7 @@ ActionButton* Player::addActionButton(uint8 button, uint32 action, uint8 type)
             }
             break;
         case ACTION_BUTTON_ITEM:
-            if(!objmgr.GetItemPrototype(action))
+            if(!ObjectMgr::GetItemPrototype(action))
             {
                 sLog.outError( "Action %u not added into button %u for player %s: item not exist", action, button, GetName() );
                 return NULL;
@@ -5696,7 +5696,7 @@ void Player::SaveRecallPosition()
 
 void Player::SendMessageToSet(WorldPacket *data, bool self)
 {
-    Map * _map = IsInWorld() ? GetMap() : MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
+    Map * _map = IsInWorld() ? GetMap() : mapmgr.FindMap(GetMapId(), GetInstanceId());
     if(_map)
     {
         _map->MessageBroadcast(this, data, self);
@@ -5711,7 +5711,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 {
-    Map * _map = IsInWorld() ? GetMap() : MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
+    Map * _map = IsInWorld() ? GetMap() : mapmgr.FindMap(GetMapId(), GetInstanceId());
     if(_map)
     {
         _map->MessageDistBroadcast(this, data, dist, self);
@@ -5724,7 +5724,7 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
 
 void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only)
 {
-    Map * _map = IsInWorld() ? GetMap() : MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
+    Map * _map = IsInWorld() ? GetMap() : mapmgr.FindMap(GetMapId(), GetInstanceId());
     if(_map)
     {
         _map->MessageDistBroadcast(this, data, dist, self, own_team_only);
@@ -6209,7 +6209,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
         float posz = fields[3].GetFloat();
         delete result;
 
-        zone = MapManager::Instance().GetZoneId(map,posx,posy,posz);
+        zone = mapmgr.GetZoneId(map,posx,posy,posz);
 
         if (zone > 0)
             CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, guidLow);
@@ -7308,7 +7308,7 @@ void Player::_ApplyAmmoBonuses()
 
     float currentAmmoDPS;
 
-    ItemPrototype const *ammo_proto = objmgr.GetItemPrototype( ammo_id );
+    ItemPrototype const *ammo_proto = ObjectMgr::GetItemPrototype( ammo_id );
     if( !ammo_proto || ammo_proto->Class!=ITEM_CLASS_PROJECTILE || !CheckAmmoCompatibility(ammo_proto))
         currentAmmoDPS = 0.0f;
     else
@@ -7377,7 +7377,7 @@ void Player::RemovedInsignia(Player* looterPlr)
 
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
-    Corpse *bones = ObjectAccessor::Instance().ConvertCorpseForPlayer(GetGUID(),true);
+    Corpse *bones = objaccessor.ConvertCorpseForPlayer(GetGUID(),true);
     if (!bones)
         return;
 
@@ -8781,7 +8781,7 @@ bool Player::HasItemOrGemWithIdEquipped( uint32 item, uint32 count, uint8 except
         }
     }
 
-    ItemPrototype const *pProto = objmgr.GetItemPrototype(item);
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(item);
     if (pProto && pProto->GemProperties)
     {
         for(int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
@@ -8838,7 +8838,7 @@ bool Player::HasItemOrGemWithLimitCategoryEquipped( uint32 limitCategory, uint32
 
 uint8 Player::_CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count ) const
 {
-    ItemPrototype const *pProto = objmgr.GetItemPrototype(entry);
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(entry);
     if( !pProto )
     {
         if(no_space_count)
@@ -9102,7 +9102,7 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
 {
     sLog.outDebug( "STORAGE: CanStoreItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, entry, count);
 
-    ItemPrototype const *pProto = objmgr.GetItemPrototype(entry);
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(entry);
     if (!pProto)
     {
         if (no_space_count)
@@ -10248,7 +10248,7 @@ uint8 Player::CanUseAmmo( uint32 item ) const
         return EQUIP_ERR_YOU_ARE_DEAD;
     //if( isStunned() )
     //    return EQUIP_ERR_YOU_ARE_STUNNED;
-    ItemPrototype const *pProto = objmgr.GetItemPrototype( item );
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( item );
     if( pProto )
     {
         if( pProto->InventoryType!= INVTYPE_AMMO )
@@ -12165,7 +12165,7 @@ void Player::PrepareQuestMenu( uint64 guid )
     {
         //we should obtain map pointer from GetMap() in 99% of cases. Special case
         //only for quests which cast teleport spells on player
-        Map * _map = IsInWorld() ? GetMap() : MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
+        Map * _map = IsInWorld() ? GetMap() : mapmgr.FindMap(GetMapId(), GetInstanceId());
         ASSERT(_map);
         GameObject *pGameObject = _map->GetGameObject(guid);
         if( pGameObject )
@@ -12322,7 +12322,7 @@ Quest const * Player::GetNextQuest( uint64 guid, Quest const *pQuest )
     {
         //we should obtain map pointer from GetMap() in 99% of cases. Special case
         //only for quests which cast teleport spells on player
-        Map * _map = IsInWorld() ? GetMap() : MapManager::Instance().FindMap(GetMapId(), GetInstanceId());
+        Map * _map = IsInWorld() ? GetMap() : mapmgr.FindMap(GetMapId(), GetInstanceId());
         ASSERT(_map);
         GameObject *pGameObject = _map->GetGameObject(guid);
         if( pGameObject )
@@ -13758,7 +13758,7 @@ bool Player::HasQuestForItem( uint32 itemid ) const
                 // examined item is a source item
                 if (qinfo->ReqSourceId[j] == itemid)
                 {
-                    ItemPrototype const *pProto = objmgr.GetItemPrototype(itemid);
+                    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemid);
 
                     // 'unique' item
                     if (pProto->MaxCount && GetItemCount(itemid,true) < pProto->MaxCount)
@@ -14312,7 +14312,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
         if(currentBg && currentBg->IsPlayerInBattleGround(GetGUID()))
         {
-            BattleGroundQueueTypeId bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
+            BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
             AddBattleGroundQueueId(bgQueueTypeId);
 
             m_bgData.bgTypeID = currentBg->GetTypeID();
@@ -14378,7 +14378,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     if (transGUID != 0)
     {
-        for (MapManager::TransportSet::const_iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
+        for (MapManager::TransportSet::const_iterator iter = mapmgr.m_Transports.begin(); iter != mapmgr.m_Transports.end(); ++iter)
         {
             if( (*iter)->GetGUIDLow() == transGUID)
             {
@@ -14427,7 +14427,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
     // NOW player must have valid map
     // load the player's map here if it's not already loaded
-    SetMap(MapManager::Instance().CreateMap(GetMapId(), this));
+    SetMap(mapmgr.CreateMap(GetMapId(), this));
 
     // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
     if(GetInstanceId() && !sInstanceSaveManager.GetInstanceSave(GetInstanceId()))
@@ -14621,7 +14621,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
         //we can be relocated from taxi and still have an outdated Map pointer!
         //so we need to get a new Map pointer!
-        SetMap(MapManager::Instance().CreateMap(GetMapId(), this));
+        SetMap(mapmgr.CreateMap(GetMapId(), this));
         SaveRecallPosition();                           // save as recall also to prevent recall and fall from sky
 
         m_taxi.ClearTaxiDestinations();
@@ -14896,7 +14896,7 @@ void Player::LoadCorpse()
 {
     if( isAlive() )
     {
-        ObjectAccessor::Instance().ConvertCorpseForPlayer(GetGUID());
+        objaccessor.ConvertCorpseForPlayer(GetGUID());
     }
     else
     {
@@ -14937,7 +14937,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             uint32 item_guid = fields[3].GetUInt32();
             uint32 item_id   = fields[4].GetUInt32();
 
-            ItemPrototype const * proto = objmgr.GetItemPrototype(item_id);
+            ItemPrototype const * proto = ObjectMgr::GetItemPrototype(item_id);
 
             if(!proto)
             {
@@ -15080,7 +15080,7 @@ void Player::_LoadMailedItems(Mail *mail)
 
         mail->AddItem(item_guid_low, item_template);
 
-        ItemPrototype const *proto = objmgr.GetItemPrototype(item_template);
+        ItemPrototype const *proto = ObjectMgr::GetItemPrototype(item_template);
 
         if(!proto)
         {
@@ -16334,7 +16334,7 @@ void Player::ResetInstances(uint8 method, bool isRaid)
         }
 
         // if the map is loaded, reset it
-        Map *map = MapManager::Instance().FindMap(p->GetMapId(), p->GetInstanceId());
+        Map *map = mapmgr.FindMap(p->GetMapId(), p->GetInstanceId());
         if(map && map->IsDungeon())
             ((InstanceMap*)map)->Reset(method);
 
@@ -17357,7 +17357,7 @@ bool Player::BuyItemFromVendor(uint64 vendorguid, uint32 item, uint8 count, uint
     if (!isAlive())
         return false;
 
-    ItemPrototype const *pProto = objmgr.GetItemPrototype( item );
+    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( item );
     if (!pProto)
     {
         SendBuyError( BUY_ERR_CANT_FIND_ITEM, NULL, item, 0);
@@ -19990,7 +19990,7 @@ uint8 Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) c
         if(!enchantEntry)
             continue;
 
-        ItemPrototype const* pGem = objmgr.GetItemPrototype(enchantEntry->GemID);
+        ItemPrototype const* pGem = ObjectMgr::GetItemPrototype(enchantEntry->GemID);
         if(!pGem)
             continue;
 

@@ -3403,7 +3403,7 @@ void Spell::WriteAmmoToPacket( WorldPacket * data )
                 uint32 ammoID = ((Player*)m_caster)->GetUInt32Value(PLAYER_AMMO_ID);
                 if(ammoID)
                 {
-                    ItemPrototype const *pProto = objmgr.GetItemPrototype( ammoID );
+                    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( ammoID );
                     if(pProto)
                     {
                         ammoDisplayID = pProto->DisplayInfoID;
@@ -4327,7 +4327,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         !IsPassiveSpell(m_spellInfo->Id) && !(m_spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED))
     {
         if (m_caster->isInFlight())
-            return SPELL_FAILED_NOT_FLYING;
+            return SPELL_FAILED_NOT_ON_TAXI;
         else
             return SPELL_FAILED_NOT_MOUNTED;
     }
@@ -5824,7 +5824,7 @@ SpellCastResult Spell::CheckItems()
                             return SPELL_FAILED_NO_AMMO;
                         }
 
-                        ItemPrototype const *ammoProto = objmgr.GetItemPrototype( ammo );
+                        ItemPrototype const *ammoProto = ObjectMgr::GetItemPrototype( ammo );
                         if(!ammoProto)
                             return SPELL_FAILED_NO_AMMO;
 

@@ -153,7 +153,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
     uint64 guid;
     recv_data >> guid;
 
-    CreatureInfo const *ci = objmgr.GetCreatureTemplate(entry);
+    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
     if (ci)
     {
 
@@ -219,7 +219,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
     uint64 guid;
     recv_data >> guid;
 
-    const GameObjectInfo *info = objmgr.GetGameObjectInfo(entryID);
+    const GameObjectInfo *info = ObjectMgr::GetGameObjectInfo(entryID);
     if(info)
     {
         std::string Name;
@@ -299,7 +299,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
             if(corpseMapEntry->IsDungeon() && corpseMapEntry->entrance_map >= 0)
             {
                 // if corpse map have entrance
-                if(Map const* entranceMap = MapManager::Instance().CreateBaseMap(corpseMapEntry->entrance_map))
+                if(Map const* entranceMap = mapmgr.CreateBaseMap(corpseMapEntry->entrance_map))
                 {
                     mapid = corpseMapEntry->entrance_map;
                     x = corpseMapEntry->entrance_x;

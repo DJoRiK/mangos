@@ -19,7 +19,7 @@
 #include "GameEventMgr.h"
 #include "World.h"
 #include "ObjectMgr.h"
-#include "PoolHandler.h"
+#include "PoolManager.h"
 #include "ProgressBar.h"
 #include "Language.h"
 #include "Log.h"
@@ -520,7 +520,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             objmgr.AddCreatureToGrid(*itr, data);
 
             // Spawn if necessary (loaded grids only)
-            Map* map = const_cast<Map*>(MapManager::Instance().CreateBaseMap(data->mapid));
+            Map* map = const_cast<Map*>(mapmgr.CreateBaseMap(data->mapid));
             // We use spawn coords to spawn
             if(!map->Instanceable() && map->IsLoaded(data->posX,data->posY))
             {
@@ -553,7 +553,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             objmgr.AddGameobjectToGrid(*itr, data);
             // Spawn if necessary (loaded grids only)
             // this base map checked as non-instanced and then only existed
-            Map* map = const_cast<Map*>(MapManager::Instance().CreateBaseMap(data->mapid));
+            Map* map = const_cast<Map*>(mapmgr.CreateBaseMap(data->mapid));
             // We use current coords to unspawn, not spawn coords since creature can have changed grid
             if(!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
             {
@@ -621,7 +621,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             objmgr.RemoveGameobjectFromGrid(*itr, data);
 
-            if( GameObject* pGameobject = ObjectAccessor::Instance().GetGameObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT)) )
+            if( GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT)) )
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -688,7 +688,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             CreatureData const* data2 = objmgr.GetCreatureData(itr->first);
             if (data2 && activate)
             {
-                CreatureInfo const *cinfo = objmgr.GetCreatureTemplate(data2->id);
+                CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(data2->id);
                 uint32 display_id = objmgr.ChooseDisplayId(0,cinfo,data2);
                 CreatureModelInfo const *minfo = objmgr.GetCreatureModelRandomGender(display_id);
                 if (minfo)

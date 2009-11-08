@@ -576,7 +576,7 @@ void Group::GroupLoot(const uint64& playerGUID, Loot *loot, Creature *creature)
 
     for (i = loot->items.begin(); i != loot->items.end(); ++i, ++itemSlot)
     {
-        item = objmgr.GetItemPrototype(i->itemid);
+        item = ObjectMgr::GetItemPrototype(i->itemid);
         if (!item)
         {
             //sLog.outDebug("Group::GroupLoot: missing item prototype for item with id: %d", i->itemid);
@@ -630,7 +630,7 @@ void Group::NeedBeforeGreed(const uint64& playerGUID, Loot *loot, Creature *crea
     uint8 itemSlot = 0;
     for(std::vector<LootItem>::iterator i=loot->items.begin(); i != loot->items.end(); ++i, ++itemSlot)
     {
-        item = objmgr.GetItemPrototype(i->itemid);
+        item = ObjectMgr::GetItemPrototype(i->itemid);
 
         //only roll for one-player items, not for ones everyone can get
         if (item->Quality >= uint32(m_lootThreshold) && !i->freeforall)
@@ -1561,7 +1561,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
 
         bool isEmpty = true;
         // if the map is loaded, reset it
-        Map *map = MapManager::Instance().FindMap(p->GetMapId(), p->GetInstanceId());
+        Map *map = mapmgr.FindMap(p->GetMapId(), p->GetInstanceId());
         if(map && map->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !p->CanReset()))
             isEmpty = ((InstanceMap*)map)->Reset(method);
 
