@@ -1805,6 +1805,21 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                 }
                 break;
             }
+            case SPELLFAMILY_PALADIN:
+            {
+                // Ardent Defender
+                if (spellProto->SpellIconID == 2135)
+                {
+                    // uses 66233 as a cooldown for healing effect
+                    if (!((Player*)pVictim)->HasAura(66233))
+                        preventDeathSpell = (*i)->GetSpellProto();
+
+                    if(pVictim->GetHealth() - RemainingDamage <= pVictim->GetMaxHealth() * 0.7f)
+                        RemainingDamage -= RemainingDamage * currentAbsorb / 100;
+
+                    continue;
+                }
+            }
             case SPELLFAMILY_PRIEST:
             {
                 // Guardian Spirit
@@ -2080,6 +2095,30 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
                     int32 healAmount = pVictim->GetMaxHealth() * preventDeathAmount / 100;
                     pVictim->CastCustomSpell(pVictim, 48153, &healAmount, NULL, NULL, true);
                     pVictim->RemoveAurasDueToSpell(preventDeathSpell->Id);
+                    RemainingDamage = 0;
+                }
+                break;
+            }
+            case SPELLFAMILY_PALADIN:
+            {
+                // Ardent Defender
+                if (preventDeathSpell->SpellIconID == 2135)
+                {
+                    int32 healAmount = preventDeathSpell->EffectBasePoints[1]; // get from dummy aura instead?
+                    int32 defRate = pVictim->GetDefenseSkillValue();
+                    defRate -= (pVictim->getLevel() * 5);
+
+                    // if no defence rating bonus don't absorb
+                    if (!defRate || defRate < 0)
+                        break;
+
+                    int32 heal = int32(defRate * pVictim->GetMaxHealth() * healAmount / 14000) - pVictim->GetHealth();
+                    if(heal > 0)
+                    {
+                        //cast heal
+                        pVictim->CastCustomSpell(pVictim, 66235, &heal, NULL, NULL, true);
+                        pVictim->CastSpell(pVictim, 66233, true);
+                    }
                     RemainingDamage = 0;
                 }
                 break;
