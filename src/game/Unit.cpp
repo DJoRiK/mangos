@@ -6967,6 +6967,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAu
             // Blood Presence
             if (dummySpell->Id == 48266)
             {
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
                 if (!((Player*)this)->isHonorOrXPTarget(pVictim))
                     return false;
 
