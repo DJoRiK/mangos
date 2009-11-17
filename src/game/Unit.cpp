@@ -1664,34 +1664,53 @@ void Unit::CalcAbsorbResist(Unit *pVictim,SpellSchoolMask schoolMask, DamageEffe
     // Magic damage, check for resists
     if ((schoolMask & SPELL_SCHOOL_MASK_NORMAL)==0)
     {
-        // Get base victim resistance for school
-        float tmpvalue2 = (float)pVictim->GetResistance(GetFirstSchoolInMask(schoolMask));
-        // Ignore resistance by self SPELL_AURA_MOD_TARGET_RESISTANCE aura
-        tmpvalue2 += (float)GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask);
+        float baseVictimResistance = (float) pVictim->GetResistance(GetFirstSchoolInMask(schoolMask));
+        float ignoredResistance = (float) GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask);
+        float victimResistance = baseVictimResistance + ignoredResistance;
 
-        tmpvalue2 *= (float)(0.15f / getLevel());
-        if (tmpvalue2 < 0.0f)
-            tmpvalue2 = 0.0f;
-        if (tmpvalue2 > 0.75f)
-            tmpvalue2 = 0.75f;
-        uint32 ran = urand(0, 100);
-        uint32 faq[4] = {24,6,4,6};
-        uint8 m = 0;
-        float Binom = 0.0f;
-        for (uint8 i = 0; i < 4; ++i)
+        uint32 BOSS_LEVEL = 83;
+        float BOSS_RESISTANCE_CONSTANT = 510.0;
+        uint32 level = getLevel();
+        float resistanceConstant = 0.0f;
+
+        if (level == BOSS_LEVEL)
         {
-            Binom += 2400 *( powf(tmpvalue2, i) * powf( (1-tmpvalue2), (4-i)))/faq[i];
-            if (ran > Binom )
-                ++m;
-            else
-                break;
+            resistanceConstant = BOSS_RESISTANCE_CONSTANT;
         }
-        if (damagetype == DOT && m == 4)
-            *resist += uint32(damage - 1);
         else
-            *resist += uint32(damage * m / 4);
-        if(*resist > damage)
-            *resist = damage;
+        {
+            resistanceConstant = level * 5.0f;
+        }
+
+        float averageResist = victimResistance / (victimResistance + resistanceConstant);
+        float discreteResistProbability[11];
+        for (int i = 0; i < 11; i++)
+        {
+            discreteResistProbability[i] = 0.5f - 2.5f * abs(0.1f * i - averageResist);
+            if (discreteResistProbability[i] < 0.0f)
+            {
+                discreteResistProbability[i] = 0.0f;
+            }
+        }
+
+        if (averageResist <= 0.1f)
+        {
+            discreteResistProbability[0] = 1.0f - 7.5f * averageResist;
+            discreteResistProbability[1] = 5.0f * averageResist;
+            discreteResistProbability[2] = 2.5f * averageResist;
+        }
+
+        float r = rand_norm();
+        int i = 0;
+        float probabilitySum = discreteResistProbability[0];
+        while (r >= probabilitySum && i < 10)
+        {
+            i++;
+            probabilitySum += discreteResistProbability[i];
+        }
+        uint32 damageResisted = damage * i / 10;
+
+        *resist += damageResisted;
     }
     else
         *resist = 0;
